@@ -1,4 +1,3 @@
-
 "use client";
 import { useMemo, useState } from "react";
 import { buildSchedule, type Match } from "@/lib/schedule";
@@ -6,7 +5,19 @@ import { loadResults, saveResult, clearResults } from "@/lib/picks";
 
 const all = buildSchedule();
 
+const RESULTS_ENABLED = process.env.NEXT_PUBLIC_ENABLE_RESULTS === "true";
 export default function ResultsPage() {
+  if (!RESULTS_ENABLED) {
+    return (
+      <main className="min-h-screen grid place-items-center p-6">
+        <div className="max-w-md text-center">
+          <h1 className="text-2xl font-bold mb-2">Resultados desativados</h1>
+          <p className="text-gray-600">Defina <code>NEXT_PUBLIC_ENABLE_RESULTS=true</code> nas variáveis de ambiente para habilitar.</p>
+        </div>
+      </main>
+    );
+  }
+
   const [stage, setStage] = useState<'GROUP'|'R32'|'R16'|'QF'|'SF'|'BRONZE'|'FINAL'>('GROUP');
 
   const matches: Match[] = useMemo(

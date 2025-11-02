@@ -4,18 +4,17 @@ export type GroupKey = 'A'|'B'|'C'|'D'|'E'|'F'|'G'|'H'|'I'|'J'|'K'|'L';
 export type TeamSlot = `${GroupKey}${1|2|3|4}`;
 
 export type Match = {
-  id: string;           // ex: "A-1", "B-4", "R32-7"
+  id: string;
   stage: Stage;
   group?: GroupKey;
-  home: string;         // "A1", "A2" ... ou "TBD" nos mata-matas
+  home: string;
   away: string;
-  kickoff?: string;     // ISO string
-  venue?: string;       // Nome do estádio ou cidade
+  kickoff?: string;
+  venue?: string;
 };
 
 export const groups: GroupKey[] = ['A','B','C','D','E','F','G','H','I','J','K','L'];
 
-// Gera 6 jogos para cada grupo (round-robin)
 function groupMatches(g: GroupKey): Match[] {
   const t1 = `${g}1`, t2 = `${g}2`, t3 = `${g}3`, t4 = `${g}4`;
   const pairs: [string,string][] = [
@@ -27,7 +26,6 @@ function groupMatches(g: GroupKey): Match[] {
     group: g,
     home: p[0],
     away: p[1],
-    // Placeholders de data/venue (ajuste depois conforme grade oficial)
     kickoff: placeholderKickoff(g, idx),
     venue: placeholderVenue(g, idx),
   }));
@@ -37,7 +35,6 @@ function allGroupStage(): Match[] {
   return groups.flatMap(groupMatches);
 }
 
-// Mata-mata placeholders (serão conectados após a classificação real)
 function knockoutPlaceholders(): Match[] {
   const r32: Match[] = Array.from({length:16}, (_,i)=>({
     id:`R32-${i+1}`, stage:'R32', home:`TBD`, away:`TBD`,
@@ -60,13 +57,9 @@ function knockoutPlaceholders(): Match[] {
   return [...r32, ...r16, ...qf, ...sf, bronze, final];
 }
 
-// Placeholders simples para datas
-// Distribui partidas entre 2026-06-11 e 2026-07-19 em horários genéricos
 function placeholderKickoff(group: GroupKey, idx: number): string {
-  // Datas fictícias coerentes
-  // Cada grupo começa em 2026-06-12 + offset baseado no grupo
   const base = new Date(Date.UTC(2026, 5, 12 + (group.charCodeAt(0) - 'A'.charCodeAt(0)), 18, 0, 0));
-  base.setUTCDate(base.getUTCDate() + Math.floor(idx/2)); // cada 2 jogos, dia seguinte
+  base.setUTCDate(base.getUTCDate() + Math.floor(idx/2));
   return base.toISOString();
 }
 

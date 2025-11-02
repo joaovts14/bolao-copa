@@ -1,4 +1,3 @@
-
 "use client";
 import { useMemo, useState } from "react";
 import { buildSchedule, type Match } from "@/lib/schedule";
@@ -52,6 +51,33 @@ export default function PalpitesPage() {
     }
   }
 
+  function handleDownload() {
+    const data = exportPicks();
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "palpites-2026.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleFileImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        importPicks(String(reader.result || "{}"));
+        alert("Palpites importados!");
+        location.reload();
+      } catch {
+        alert("Arquivo inválido.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
   return (
     <main className="min-h-screen p-4 md:p-6">
       <div className="mx-auto max-w-5xl">
@@ -63,7 +89,11 @@ export default function PalpitesPage() {
             <button onClick={() => { if(confirm("Apagar todos os palpites?")) { clearPicks(); location.reload(); } }}
                     className="rounded-xl border px-4 py-2">Zerar Tudo</button>
             <button onClick={handleExport} className="rounded-xl border px-4 py-2">Exportar JSON</button>
-            <button onClick={handleImport} className="rounded-xl border px-4 py-2">Importar JSON</button>
+            <button onClick={handleDownload} className="rounded-xl border px-4 py-2">Download JSON</button>
+            <label className="rounded-xl border px-4 py-2 cursor-pointer">
+              Importar arquivo
+              <input type="file" accept="application/json" onChange={handleFileImport} className="hidden" />
+            </label>
           </div>
         </header>
 

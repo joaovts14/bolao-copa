@@ -39,7 +39,6 @@ export function picksFor(matches: Match[]): Record<string, Pick> {
   return out;
 }
 
-// Results
 export function loadResults(): Record<string, Result> {
   if (typeof window === "undefined") return {};
   try { return JSON.parse(localStorage.getItem(RESULTS_KEY) || "{}"); } catch { return {}; }
